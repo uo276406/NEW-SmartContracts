@@ -1,5 +1,6 @@
 import { Contract } from "@ethersproject/contracts";
 import detectEthereumProvider from "@metamask/detect-provider";
+import { decodeError } from "@ubiquity-os/ethers-decode-error";
 import { ethers } from "ethers";
 import React, { useEffect, useRef, useState } from "react";
 import myContractManifest from "./contracts/MyContract.json";
@@ -8,6 +9,8 @@ export function Ejercicio1() {
   const myContract = useRef(null);
   const [tikets, setTikets] = useState([]);
   const [balance, setBalance] = useState(0);
+  const [contractBalance, setContractBalance] = useState("0");
+  const [balanceWei, setBalanceWei] = useState("0");
 
   useEffect(() => {
     initContracts();
@@ -16,6 +19,8 @@ export function Ejercicio1() {
   let initContracts = async () => {
     await configureBlockchain();
     await getWalletBalance();
+    await getContractBalance();
+    await getBalanceWei();
     let tiketsFromBlockchain = await myContract.current?.getTikets();
     if (tiketsFromBlockchain != null) setTikets(tiketsFromBlockchain);
   };
@@ -28,7 +33,7 @@ export function Ejercicio1() {
         provider = new ethers.providers.Web3Provider(provider);
         const signer = provider.getSigner();
         myContract.current = new Contract(
-          "0x8e48003b03A883B8817B5ac85835474be8793CE1",
+          "0xC02CDb28aFbFd6540bdb73E166EcB0D692Ab27B3",
           myContractManifest.abi,
           signer
         );
@@ -48,6 +53,28 @@ export function Ejercicio1() {
     }
   };
 
+  const getContractBalance = async () => {
+    myContract.current.getContractBalance().then(
+      (result) => {
+        setContractBalance(ethers.utils.formatEther(result.toString()));
+      },
+      (error) => {
+        alert(error.data.message);
+      }
+    );
+  };
+
+  const getBalanceWei = async () => {
+    myContract.current.getBalanceWei().then(
+      (result) => {
+        setBalanceWei(ethers.utils.formatEther(result.toString()));
+      },
+      (error) => {
+        alert(error.data.message);
+      }
+    );
+  };
+
   let clickBuyTiket = async (i) => {
     const balanceInEth = parseFloat(balance).toFixed(18);
     if (parseFloat(balanceInEth) < 0.02) {
@@ -60,14 +87,30 @@ export function Ejercicio1() {
       gasLimit: 6721975,
       gasPrice: 20000000000,
     });
-    await tx.wait();
-
-    const tiketsUpdated = await myContract.current.getTikets();
-    setTikets(tiketsUpdated);
+    try {
+      await tx.wait();
+      const tiketsUpdated = await myContract.current.getTikets();
+      setTikets(tiketsUpdated);
+      await getBalanceWei();
+      await getContractBalance();
+      await getWalletBalance();
+    } catch (error) {
+      const errorDecoded = decodeError(error);
+      alert("Revert reason:" + errorDecoded.error);
+    }
   };
 
   let withdrawBalance = async () => {
-    const tx = await myContract.current.transferBalanceToAdmin();
+    myContract.current.transferBalanceToAdmin().then(
+      () => {
+        getContractBalance();
+        getBalanceWei();
+        getWalletBalance();
+      },
+      (error) => {
+        alert(error.data.message);
+      }
+    );
   };
 
   let changeAdmin = async (e) => {
@@ -75,17 +118,24 @@ export function Ejercicio1() {
     const newAddress = e.target.elements[0].value;
 
     const tx = await myContract.current.changeAdmin(newAddress, {
-      value: ethers.utils.parseEther("0.0001"),
+      value: 0,
       gasLimit: 6721975,
       gasPrice: 20000000000,
     });
-    await tx.wait();
+    try {
+      await tx.wait();
+    } catch (error) {
+      const errorDecoded = decodeError(error);
+      alert("Revert reason:" + errorDecoded.error);
+    }
   };
 
   return (
     <div>
       <h1>Tikets store</h1>
-      <h2>Balance: {balance}</h2>
+      <h2>Wallet Balance: {balance} BNB</h2>
+      <h2>Contract Balance: {contractBalance} BNB</h2>
+      <h2>Balance Wei: {balanceWei} BNB</h2>
       <button onClick={() => withdrawBalance()}>Withdraw Balance</button>
       <ul>
         {tikets.map((address, i) => (

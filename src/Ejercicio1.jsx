@@ -28,7 +28,7 @@ export function Ejercicio1() {
         provider = new ethers.providers.Web3Provider(provider);
         const signer = provider.getSigner();
         myContract.current = new Contract(
-          "0xA1d284274c366598564A5A41F37166B3a8B75f3b",
+          "0x8e48003b03A883B8817B5ac85835474be8793CE1",
           myContractManifest.abi,
           signer
         );
@@ -70,6 +70,18 @@ export function Ejercicio1() {
     const tx = await myContract.current.transferBalanceToAdmin();
   };
 
+  let changeAdmin = async (e) => {
+    e.preventDefault();
+    const newAddress = e.target.elements[0].value;
+
+    const tx = await myContract.current.changeAdmin(newAddress, {
+      value: ethers.utils.parseEther("0.0001"),
+      gasLimit: 6721975,
+      gasPrice: 20000000000,
+    });
+    await tx.wait();
+  };
+
   return (
     <div>
       <h1>Tikets store</h1>
@@ -88,6 +100,10 @@ export function Ejercicio1() {
           </li>
         ))}
       </ul>
+      <form onSubmit={(e) => changeAdmin(e)}>
+        <input type="text" />
+        <button type="submit"> Change Admin </button>
+      </form>
     </div>
   );
 }

@@ -33,7 +33,7 @@ export function Ejercicio1() {
         provider = new ethers.providers.Web3Provider(provider);
         const signer = provider.getSigner();
         myContract.current = new Contract(
-          "0xC02CDb28aFbFd6540bdb73E166EcB0D692Ab27B3",
+          "0x42579Bb5B3Ad55ef9cD2d170e14248fE4879b80A",
           myContractManifest.abi,
           signer
         );
@@ -41,7 +41,7 @@ export function Ejercicio1() {
     } catch (error) {}
   };
 
-  let getWalletBalance = async (provider) => {
+  let getWalletBalance = async () => {
     try {
       const provider = new ethers.providers.Web3Provider(window.ethereum);
       const signer = provider.getSigner();
@@ -76,14 +76,15 @@ export function Ejercicio1() {
   };
 
   let clickBuyTiket = async (i) => {
+    const buyAmount = document.getElementById("buyAmount").value;
     const balanceInEth = parseFloat(balance).toFixed(18);
-    if (parseFloat(balanceInEth) < 0.02) {
+    if (parseFloat(balanceInEth) < 0.01) {
       alert("No tienes suficiente balance para comprar un tiket.");
       return;
     }
 
     const tx = await myContract.current.buyTiket(i, {
-      value: ethers.utils.parseEther("0.02"),
+      value: ethers.utils.parseEther(buyAmount),
       gasLimit: 6721975,
       gasPrice: 20000000000,
     });
@@ -136,6 +137,10 @@ export function Ejercicio1() {
       <h2>Wallet Balance: {balance} BNB</h2>
       <h2>Contract Balance: {contractBalance} BNB</h2>
       <h2>Balance Wei: {balanceWei} BNB</h2>
+      <label for="buyAmount">BNB to buy ticket</label>
+      <input id="buyAmount" type="number" value="0" />
+      <br />
+      <br />
       <button onClick={() => withdrawBalance()}>Withdraw Balance</button>
       <ul>
         {tikets.map((address, i) => (

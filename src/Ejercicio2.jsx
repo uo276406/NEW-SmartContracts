@@ -7,6 +7,7 @@ import bankManifest from "./contracts/Bank.json";
 export function Ejercicio2() {
   const [balance, setBalance] = useState("0");
   const [interest, setInterest] = useState("0");
+  const [doubleInterest, setDoubleInterest] = useState("0");
   const bank = useRef(null);
 
   useEffect(() => {
@@ -29,7 +30,7 @@ export function Ejercicio2() {
       const signer = provider.getSigner();
 
       bank.current = new Contract(
-        "0x722f60cF1040C42ba0C3a5DfeA9FD8828E4d82B1",
+        "0xbADF866177b2002d1ecce890fBeb1bC94b2cAAe2",
         bankManifest.abi,
         signer
       );
@@ -66,13 +67,13 @@ export function Ejercicio2() {
   let clickWithdraw = async (e, double) => {
     if (double) {
       await bank.current.withdrawDouble({
-        value: ethers.utils.parseEther(String(0.1)),
+        value: ethers.utils.parseEther(String(0.05)),
         gasLimit: 6721975,
         gasPrice: 20000000000,
       });
     } else {
       await bank.current.withdraw({
-        value: ethers.utils.parseEther(String(0.1)),
+        value: ethers.utils.parseEther(String(0.05)),
         gasLimit: 6721975,
         gasPrice: 20000000000,
       });
@@ -90,8 +91,10 @@ export function Ejercicio2() {
 
   const getInterest = async () => {
     try {
-      const interest = await bank.current.getGeneratedInterest();
+      const interest = await bank.current.getGeneratedInterest(false);
       setInterest(ethers.utils.formatEther(interest));
+      const doubleInterest = await bank.current.getGeneratedInterest(true);
+      setDoubleInterest(ethers.utils.formatEther(doubleInterest));
     } catch (error) {
       console.error("Error getting interest:", error);
     }
@@ -127,6 +130,7 @@ export function Ejercicio2() {
       <br />
       <h2>Balance: {balance} BNB</h2>
       <h2>Interest: {interest} BMIW</h2>
+      <h2>Interest (Double): {doubleInterest} BMIW</h2>
       <button onClick={() => update()}>Update balance and interes</button>
     </div>
   );

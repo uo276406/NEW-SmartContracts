@@ -31,13 +31,13 @@ export function Ejercicio3() {
       setAddress(signer.getAddress());
 
       realState.current = new Contract(
-        "0xF9fcA8189aB342ea30F010C34eaf061E54558B45",
+        "0x75B74115B7bcfBA24D3E9e8DB74F1c14cd6C02E6",
         realStateContractManifest.abi,
         signer
       );
 
       realStateCities.current = new Contract(
-        "0xFDfF5E1d8221E152A50BCbb0395148880c88d4c1",
+        "0xb4e7BDC755Cb4E79beA20933Ff1Ca2fbE42d8441",
         realStateContractCitiesManifest.abi,
         signer
       );
@@ -55,6 +55,7 @@ export function Ejercicio3() {
       meters: parseInt(e.target.elements[3].value),
       registration: parseInt(e.target.elements[4].value),
       owner: e.target.elements[5].value,
+      price: e.target.elements[6].value,
       author: address,
       time: parseFloat(new Date().getTime()),
     });
@@ -110,6 +111,7 @@ export function Ejercicio3() {
         <input type="number" placeholder="meters" />
         <input type="number" placeholder="registration" />
         <input type="text" placeholder="owner name" />
+        <input type="number" placeholder="price" />
         <button type="submit">Add</button>
       </form>
       <h2>Search RealState</h2>
@@ -128,7 +130,8 @@ export function Ejercicio3() {
           </button>
           {r.city} - {r.street} - {ethers.BigNumber.from(r.number).toNumber()} -
           {ethers.BigNumber.from(r.meters).toNumber()} -
-          {ethers.BigNumber.from(r.registration).toNumber()} -{r.owner}
+          {ethers.BigNumber.from(r.registration).toNumber()} -{r.owner} -
+          {ethers.BigNumber.from(r.price).toNumber()}€
         </p>
       ))}
       <h2>Admins</h2>
@@ -148,7 +151,8 @@ export function Ejercicio3() {
           {ethers.BigNumber.from(h.realState.number).toNumber()} -
           {ethers.BigNumber.from(h.realState.meters).toNumber()} -
           {ethers.BigNumber.from(h.realState.registration).toNumber()} -
-          {h.realState.owner}(
+          {h.realState.owner} -
+          {ethers.BigNumber.from(h.realState.price).toNumber()}€(
           {new Date(
             ethers.BigNumber.from(h.realState.time).toNumber() * 1000
           ).toLocaleString()}

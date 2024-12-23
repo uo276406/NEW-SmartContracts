@@ -9,6 +9,8 @@ export function Ejercicio3() {
   const realState = useRef(null);
   const [realStateArray, setRealStateArray] = useState([]);
   const [admins, setAdmins] = useState([]);
+  const [history, setHistory] = useState([]);
+  const [address, setAddress] = useState("");
 
   useEffect(() => {
     initContracts();
@@ -26,15 +28,16 @@ export function Ejercicio3() {
 
       provider = new ethers.providers.Web3Provider(provider);
       const signer = provider.getSigner();
+      setAddress(signer.getAddress());
 
       realState.current = new Contract(
-        "0xb27f7DccD8D69a4fA0A29adb6DD4DFc867026Ad7",
+        "0xF9fcA8189aB342ea30F010C34eaf061E54558B45",
         realStateContractManifest.abi,
         signer
       );
 
       realStateCities.current = new Contract(
-        "0x30C638aeDB170a057095dCed4f84671D4a332647",
+        "0xFDfF5E1d8221E152A50BCbb0395148880c88d4c1",
         realStateContractCitiesManifest.abi,
         signer
       );
@@ -52,6 +55,8 @@ export function Ejercicio3() {
       meters: parseInt(e.target.elements[3].value),
       registration: parseInt(e.target.elements[4].value),
       owner: e.target.elements[5].value,
+      author: address,
+      time: parseFloat(new Date().getTime()),
     });
 
     await tx.wait();
@@ -89,6 +94,11 @@ export function Ejercicio3() {
     setAdmins(admins);
   };
 
+  let viewHistory = async () => {
+    let history = await realStateCities.current.getHistory();
+    setHistory(history);
+  };
+
   return (
     <div>
       <h1>RealState</h1>
@@ -116,7 +126,7 @@ export function Ejercicio3() {
           >
             Delete
           </button>
-          {r.city} -{r.street} -{ethers.BigNumber.from(r.number).toNumber()} -
+          {r.city} - {r.street} - {ethers.BigNumber.from(r.number).toNumber()} -
           {ethers.BigNumber.from(r.meters).toNumber()} -
           {ethers.BigNumber.from(r.registration).toNumber()} -{r.owner}
         </p>
@@ -129,6 +139,21 @@ export function Ejercicio3() {
       <button onClick={() => getAdmins()}>Get Admins</button>
       {admins.map((a) => (
         <p>{a}</p>
+      ))}
+      <h2>History</h2>
+      <button onClick={() => viewHistory()}>View history</button>
+      {history.map((h) => (
+        <p>
+          {h.realState.city} - {h.realState.street} -
+          {ethers.BigNumber.from(h.realState.number).toNumber()} -
+          {ethers.BigNumber.from(h.realState.meters).toNumber()} -
+          {ethers.BigNumber.from(h.realState.registration).toNumber()} -
+          {h.realState.owner}(
+          {new Date(
+            ethers.BigNumber.from(h.realState.time).toNumber() * 1000
+          ).toLocaleString()}
+          ) ({h.realState.author}) ({h.action})
+        </p>
       ))}
     </div>
   );

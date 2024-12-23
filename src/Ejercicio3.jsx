@@ -28,13 +28,13 @@ export function Ejercicio3() {
       const signer = provider.getSigner();
 
       realState.current = new Contract(
-        "0xeE2b37D8213FA903D86781e7C05f0191117fDd6D",
+        "0xb27f7DccD8D69a4fA0A29adb6DD4DFc867026Ad7",
         realStateContractManifest.abi,
         signer
       );
 
       realStateCities.current = new Contract(
-        "0x4683A7d7E232B87D5D0d72708910CaED4bd100df",
+        "0x30C638aeDB170a057095dCed4f84671D4a332647",
         realStateContractCitiesManifest.abi,
         signer
       );
@@ -66,9 +66,10 @@ export function Ejercicio3() {
     setRealStateArray(newProperties);
   };
 
-  let clickOnDeleteRealState = async (registration) => {
-    const tx = await realState.current.deleteRealStateByRegistration(
-      registration
+  let clickOnDeleteRealState = async (registration, city) => {
+    const tx = await realStateCities.current.deleteRealStateByRegistration(
+      registration,
+      city
     );
     await tx.wait();
     setRealStateArray([]);
@@ -110,7 +111,7 @@ export function Ejercicio3() {
         <p>
           <button
             onClick={() => {
-              clickOnDeleteRealState(r.registration);
+              clickOnDeleteRealState(r.registration, r.city);
             }}
           >
             Delete

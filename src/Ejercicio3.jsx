@@ -8,6 +8,7 @@ export function Ejercicio3() {
   const realStateCities = useRef(null);
   const realState = useRef(null);
   const [realStateArray, setRealStateArray] = useState([]);
+  const [admins, setAdmins] = useState([]);
 
   useEffect(() => {
     initContracts();
@@ -27,13 +28,13 @@ export function Ejercicio3() {
       const signer = provider.getSigner();
 
       realState.current = new Contract(
-        "0xDc0e6049F429CE9a4Ef1aA965b888ef70289b6a8",
+        "0xeE2b37D8213FA903D86781e7C05f0191117fDd6D",
         realStateContractManifest.abi,
         signer
       );
 
       realStateCities.current = new Contract(
-        "0xE516d1F3Ec8F899858e7b3506EB930f25a682e07",
+        "0x4683A7d7E232B87D5D0d72708910CaED4bd100df",
         realStateContractCitiesManifest.abi,
         signer
       );
@@ -73,6 +74,20 @@ export function Ejercicio3() {
     setRealStateArray([]);
   };
 
+  let anSubmitAddAdmin = async (e) => {
+    e.preventDefault();
+
+    const tx = await realStateCities.current.addAdmin(
+      e.target.elements[0].value
+    );
+    await tx.wait();
+  };
+
+  let getAdmins = async () => {
+    let admins = await realStateCities.current.getAdmins();
+    setAdmins(admins);
+  };
+
   return (
     <div>
       <h1>RealState</h1>
@@ -104,6 +119,15 @@ export function Ejercicio3() {
           {ethers.BigNumber.from(r.meters).toNumber()} -
           {ethers.BigNumber.from(r.registration).toNumber()} -{r.owner}
         </p>
+      ))}
+      <h2>Admins</h2>
+      <form onSubmit={(e) => anSubmitAddAdmin(e)}>
+        <input type="text" placeholder="admin address" />
+        <button type="submit">Add</button>
+      </form>
+      <button onClick={() => getAdmins()}>Get Admins</button>
+      {admins.map((a) => (
+        <p>{a}</p>
       ))}
     </div>
   );

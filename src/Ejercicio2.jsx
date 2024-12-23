@@ -30,7 +30,7 @@ export function Ejercicio2() {
       const signer = provider.getSigner();
 
       bank.current = new Contract(
-        "0xbADF866177b2002d1ecce890fBeb1bC94b2cAAe2",
+        "0x067BE68122865F4a7bb687dA8D6EDa44BCEa597b",
         bankManifest.abi,
         signer
       );
@@ -109,6 +109,18 @@ export function Ejercicio2() {
     }
   };
 
+  const onSubmitBuy = async (e) => {
+    e.preventDefault();
+    const BMIWamount = parseFloat(e.target.elements[0].value);
+
+    const tx = await bank.current.buyBMIW(BMIWamount, {
+      value: ethers.utils.parseEther(String(BMIWamount * 0.001)),
+      gasLimit: 6721975,
+      gasPrice: 20000000000,
+    });
+    await tx.wait();
+  };
+
   return (
     <div>
       <h1>Bank</h1>
@@ -132,6 +144,14 @@ export function Ejercicio2() {
       <h2>Interest: {interest} BMIW</h2>
       <h2>Interest (Double): {doubleInterest} BMIW</h2>
       <button onClick={() => update()}>Update balance and interes</button>
+      <h2>Compra de tokens BMIW</h2>
+      <form onSubmit={(e) => onSubmitBuy(e)}>
+        <label for="bmiwBuy">
+          Indique cuantos tokens BMIW (1 BMIW = 0.001 BNB):
+        </label>
+        <input id="bmiwBuy" type="number" step="0.01" />
+        <button type="submit">Buy</button>
+      </form>
     </div>
   );
 }

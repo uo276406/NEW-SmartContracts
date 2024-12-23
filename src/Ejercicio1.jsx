@@ -138,7 +138,7 @@ export function Ejercicio1() {
       <h2>Contract Balance: {contractBalance} BNB</h2>
       <h2>Balance Wei: {balanceWei} BNB</h2>
       <label for="buyAmount">BNB to buy ticket</label>
-      <input id="buyAmount" type="number" value="0" />
+      <input id="buyAmount" type="number" />
       <br />
       <br />
       <button onClick={() => withdrawBalance()}>Withdraw Balance</button>

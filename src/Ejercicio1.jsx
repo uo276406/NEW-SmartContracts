@@ -76,7 +76,10 @@ export function Ejercicio1() {
   };
 
   let clickBuyTiket = async (i) => {
-    const buyAmount = document.getElementById("buyAmount").value;
+    let buyAmount = document.getElementById("buyAmount").value;
+    if (buyAmount == "") {
+      buyAmount = "0";
+    }
     const balanceInEth = parseFloat(balance).toFixed(18);
     if (parseFloat(balanceInEth) < 0.01) {
       alert("No tienes suficiente balance para comprar un tiket.");

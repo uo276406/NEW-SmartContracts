@@ -33,7 +33,7 @@ export function Ejercicio1() {
         provider = new ethers.providers.Web3Provider(provider);
         const signer = provider.getSigner();
         myContract.current = new Contract(
-          "0x42579Bb5B3Ad55ef9cD2d170e14248fE4879b80A",
+          "0x66fC2521273fABC6cB06CB79B469A94129869072",
           myContractManifest.abi,
           signer
         );
@@ -109,7 +109,8 @@ export function Ejercicio1() {
         getWalletBalance();
       },
       (error) => {
-        alert(error.data.message);
+        const errorDecoded = decodeError(error);
+        alert("Revert reason:" + errorDecoded.error);
       }
     );
   };
